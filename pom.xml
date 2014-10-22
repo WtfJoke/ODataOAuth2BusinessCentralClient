@@ -30,9 +30,9 @@
   
   <parent>
     <groupId>org.apache.olingo</groupId>
-    <artifactId>odata-parent</artifactId>
+    <artifactId>odata-samples</artifactId>
     <version>4.0.0-beta-02-SNAPSHOT</version>
-    <relativePath>../..</relativePath>
+    <relativePath>..</relativePath>
   </parent>
 
   <dependencies>
