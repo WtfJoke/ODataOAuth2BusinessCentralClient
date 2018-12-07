@@ -69,7 +69,8 @@ public class Adal4JOAuth2HttpClientFactory extends AbstractOAuth2HttpClientFacto
         final Future<AuthenticationResult> yay = this.context.acquireTokenByAuthorizationCode(authorizationCode, URI.create(redirectURI), clientCredentials, resourceURI, new AuthenticationCallback() {
             @Override
             public void onSuccess(Object o) {
-                System.out.println("Yay, acquired auth-token!");
+                AuthenticationResult result = (AuthenticationResult)o;
+                System.out.println("Yay, acquired auth-token! Expires on " + result.getExpiresOnDate());
             }
 
             @Override
