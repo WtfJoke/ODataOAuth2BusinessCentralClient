@@ -1,0 +1,17 @@
+.pmd
+.project
+.classpath
+.settings
+.idea
+target
+bin
+*.bak
+classes
+.DS_Store
+*.local
+nb-configuration.xml
+.externalToolBuilders
+maven-eclipse.xml
+dependency-reduced-pom.xml
+*.iml
+credentials.properties
