@@ -24,16 +24,11 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>odata-client-sample</artifactId>
+  <artifactId>ODataOAuth2BusinessCentralClient</artifactId>
   <packaging>jar</packaging>
   <name>${project.artifactId}</name>
-
-  <parent>
-    <groupId>org.apache.olingo</groupId>
-    <artifactId>odata-samples</artifactId>
-    <version>4.6.0-SNAPSHOT</version>
-    <relativePath>..</relativePath>
-  </parent>
+  <groupId>org.apache.olingo</groupId>
+  <version>1.0-SNAPSHOT</version>
 
   <build>
     <plugins>
@@ -67,18 +62,18 @@
     <dependency>
       <groupId>org.apache.olingo</groupId>
       <artifactId>odata-client-core</artifactId>
-      <version>${project.version}</version>
+      <version>4.5.0</version>
     </dependency>
     <dependency>
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
-      <version>${commons.logging.version}</version>
+      <version>1.2</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
-      <version>${sl4j.version}</version>
+      <version>1.7.7</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
