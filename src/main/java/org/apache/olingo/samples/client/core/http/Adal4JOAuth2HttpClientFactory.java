@@ -1,30 +1,17 @@
 package org.apache.olingo.samples.client.core.http;
 
-import com.google.api.client.auth.oauth2.AuthorizationCodeFlow;
-import com.google.api.client.auth.oauth2.AuthorizationCodeRequestUrl;
-import com.google.api.client.auth.oauth2.BearerToken;
-import com.google.api.client.auth.oauth2.ClientParametersAuthentication;
-import com.google.api.client.http.GenericUrl;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
 import com.microsoft.aad.adal4j.AuthenticationCallback;
 import com.microsoft.aad.adal4j.AuthenticationContext;
 import com.microsoft.aad.adal4j.AuthenticationResult;
 import com.microsoft.aad.adal4j.ClientCredential;
-import org.apache.http.HttpException;
 import org.apache.http.HttpHeaders;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.protocol.HttpContext;
 import org.apache.olingo.client.core.http.AbstractOAuth2HttpClientFactory;
 import org.apache.olingo.client.core.http.OAuth2Exception;
 
 import java.awt.*;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -46,7 +33,7 @@ public class Adal4JOAuth2HttpClientFactory extends AbstractOAuth2HttpClientFacto
 
     public Adal4JOAuth2HttpClientFactory(String authority, final String clientId, final String clientSecret,
                                          final String redirectURI, final String resourceURI) {
-        super(null, URI.create(authority + "/oauth2/token?resource=" + resourceURI));
+        super(createGrantURL(authority, clientId, redirectURI, resourceURI), URI.create(authority + "/oauth2/token?resource=" + resourceURI));
         this.authority = authority;
         this.clientId = clientId;
         this.clientSecret = clientSecret;
@@ -54,6 +41,11 @@ public class Adal4JOAuth2HttpClientFactory extends AbstractOAuth2HttpClientFacto
         this.redirectURI = redirectURI;
         this.resourceURI = resourceURI;
         this.authURL = authority + "/oauth2/authorize?resource=" + resourceURI;
+    }
+
+    private static URI createGrantURL(String authority, String clientId, String redirectURI, String resourceURI) {
+        String grantURL = authority + "/oauth2/authorize?resource=" + resourceURI + "&client_id=" + clientId + "&redirect_uri=" + redirectURI + "&response_type=code";
+        return URI.create(grantURL);
     }
 
     @Override
@@ -65,24 +57,15 @@ public class Adal4JOAuth2HttpClientFactory extends AbstractOAuth2HttpClientFacto
     protected void init() throws OAuth2Exception {
         //   String authority = "https://login.microsoftonline.com/contoso.onmicrosoft.com/";
         ExecutorService service = Executors.newFixedThreadPool(1);
-
-        final ClientParametersAuthentication clientAuthentication = new ClientParametersAuthentication(clientId, clientSecret);
-
         try {
             this.context = new AuthenticationContext(authority, true, service);
-            final AuthorizationCodeFlow authorizationCodeFlow = new AuthorizationCodeFlow(BearerToken.authorizationHeaderAccessMethod(), new NetHttpTransport(), new JacksonFactory(), new GenericUrl(oauth2TokenServiceURI), clientAuthentication, clientId, authURL);
-            AuthorizationCodeRequestUrl request = authorizationCodeFlow.newAuthorizationUrl();
-            if (redirectURI != null) {
-                request.setRedirectUri(redirectURI);
-            }
-            String accessTokenURL = request.build();
             if (Desktop.isDesktopSupported()) {
-                Desktop.getDesktop().browse(new URI(accessTokenURL)); // open oauth request
+                Desktop.getDesktop().browse(oauth2GrantServiceURI); // open oauth request
             }
             System.out.print("Please insert authorization code:");
             final Scanner in = new Scanner(System.in, "UTF-8");
             this.authorizationCode = in.nextLine();
-        } catch (IOException | URISyntaxException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -116,9 +99,9 @@ public class Adal4JOAuth2HttpClientFactory extends AbstractOAuth2HttpClientFacto
     @Override
     protected void accessToken(DefaultHttpClient client) throws OAuth2Exception {
         client.addRequestInterceptor((request, context) -> {
-                request.removeHeaders(HttpHeaders.AUTHORIZATION);
-                request.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
-            });
+            request.removeHeaders(HttpHeaders.AUTHORIZATION);
+            request.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+        });
     }
 
     @Override
